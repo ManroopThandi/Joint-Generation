@@ -11,7 +11,6 @@ def jg(items: np.ndarray, requirements: np.ndarray):
     int_size = 32
     ccols = (cols - 1) // int_size + 1
 
-    # Feasible and minimal feasible baskets (using list of arrays for dynamic behavior)
     feasibleBaskets = []
     minimalFeasibleBaskets = []
     rs_fb = []
@@ -92,20 +91,19 @@ def jg(items: np.ndarray, requirements: np.ndarray):
 
 def rows_to_bits(bitrow):
     """
-    Compresses a 1D binary vector (0/1 or bool) into a list of uint32 integers,
+    Compresses a 1D binary vector into a list of integers,
     where each bit in the output represents a bit in the input.
-    The first bit in the input becomes the least significant bit (LSB).
     
     Args:
-        bitrow (list or np.ndarray): 1D array of 0s and 1s (length <= any).
+        bitrow: 1D array of 0s and 1s.
     
     Returns:
-        np.ndarray: 1D array of uint32 integers encoding the bits.
+        1D array of integers of encoded bits. 
     """
     int_size = 32
     bitrow = np.asarray(bitrow, dtype=np.uint8).flatten()
     num_bits = len(bitrow)
-    num_ints = (num_bits + int_size - 1) // int_size  # ceiling division
+    num_ints = (num_bits + int_size - 1) // int_size  
 
     result = np.zeros(num_ints, dtype=np.uint32)
 
@@ -114,7 +112,7 @@ def rows_to_bits(bitrow):
         for k in range(chunk_size):
             idx = j * int_size + k
             if bitrow[idx]:
-                result[j] |= (1 << k)  # Set bit `k` if bitrow[idx] == 1
+                result[j] |= (1 << k)  
 
     return result
 
@@ -122,14 +120,14 @@ import numpy as np
 
 def rfb(n, width=32):
     """
-    Convert an integer to a list of 0/1 bits (LSB first).
+    Convert an integer to a list of 0/1 bits.
     
     Args:
-        n (int): The number to convert.
-        width (int): How many bits to extract (default: 32).
+        n: The number to convert.
+        width: How many bits to extract.
         
     Returns:
-        List[int]: A list of 0s and 1s representing the binary form of `n`.
+        List: A list of 0s and 1s representing the binary form of inputted number. 
     """
     return [(n >> i) & 1 for i in range(width)]
 
