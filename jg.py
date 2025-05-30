@@ -146,16 +146,14 @@ def is_basket(basket_items: np.ndarray, requirements: np.ndarray, boolean_vector
         bool: True if basket meets all requirements, False otherwise
     """
     # Multiply items by selection vector and sum nutrients
-    basket = basket_items * boolean_vector
+    basket = basket_items * boolean_vector.T
     nut_values = np.sum(basket, axis=1)
-    
     # Check if all requirements are met
     feasible = np.all(nut_values >= requirements)
     
     return feasible
 
-def dcheck(f: np.ndarray, g: np.ndarray):
-
+def dcheck(f: np.ndarray, g: np.ndarray, size):
     f_and_g = f + g
     solver = Solver(name='Glucose4')
     for clause in f_and_g:
@@ -169,26 +167,25 @@ def dcheck(f: np.ndarray, g: np.ndarray):
         is_dual = 1
     
     clause = solver.get_model()
+    print(clause)
     if clause:
-        clause = [1 if x > 0 else 0 for x in clause]
+        clause = [1 if x != 0 else 0 for x in clause]
+        print(clause)
     else:
         clause = 0
         
     return is_dual, clause
 
+
 def transform_sat(clause, option):
     # This takes in a Boolean list of 0's and 1's (clause)
     # The other input represents whether it is part of the FB list or mFB list
     # If it is part of the mFB list the clause must be multipled by -1 
-
-    size = len(clause)
-    vector = np.arange(1, size + 1)
-
+    # Convert to flat NumPy array
+    flat = np.array(clause).flatten()
+    indices = np.where(flat == 1)[0]
+    
     if option:
-        transformed_clause = np.array(clause) * vector
+        return (-1*(indices+1)).tolist()
     else:
-        transformed_clause = -np.array(clause) * vector
-
-    transformed_list = list(map(int, transformed_clause[transformed_clause != 0]))
-
-    return transformed_list
+        return ((indices+1)).tolist()
